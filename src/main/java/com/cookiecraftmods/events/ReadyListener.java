@@ -30,6 +30,16 @@ public class ReadyListener extends ListenerAdapter {
                             ),
                     Commands.slash("profile", "Show a user's profile")
                             .addOption(OptionType.USER, "user", "Target user (default: you)", false),
+                    Commands.slash("leaderboard", "Show leaderboard for XP/Cookies/Reputation")
+                            .addOptions(
+                                    new OptionData(OptionType.STRING, "type", "Leaderboard type", false)
+                                            .addChoices(
+                                                    new Command.Choice("XP", "xp"),
+                                                    new Command.Choice("Cookies", "cookies"),
+                                                    new Command.Choice("Reputation", "reputation")
+                                            )
+                            ),
+                    Commands.slash("help", "Show help entries from database"),
                     Commands.slash("rep", "Grant one reputation point to someone (1x per day)")
                             .addOption(OptionType.USER, "user", "User to give reputation to", true),
                     Commands.slash("daily", "Claim your daily cookies reward")

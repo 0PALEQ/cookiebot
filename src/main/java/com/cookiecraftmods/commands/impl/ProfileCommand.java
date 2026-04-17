@@ -4,6 +4,7 @@ import com.cookiecraftmods.commands.ICommand;
 import com.cookiecraftmods.database.UserRepository;
 import com.cookiecraftmods.database.UserRepository.UserProfile;
 import com.cookiecraftmods.utils.EmbedUtil;
+import com.cookiecraftmods.utils.LevelUtil;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -40,7 +41,18 @@ public class ProfileCommand implements ICommand {
                         .addField("XP", p == null ? "0" : String.valueOf(p.xp), true)
                         .addField("Cookies", p == null ? "0" : String.valueOf(p.cookies), true)
                         .addField("Reputation", p == null ? "0" : String.valueOf(p.reputation), true)
+                        .addField("Level", p == null ? "1" : String.valueOf(LevelUtil.levelForXp(p.xp)), true)
+                        .addField("Progress", buildProgress(p), false)
                         .build()
         ).queue();
+    }
+
+    private String buildProgress(UserProfile p) {
+        if (p == null) return "`0/100`\n```\n░░░░░░░░░░\n```";
+        int level = LevelUtil.levelForXp(p.xp);
+        int into = LevelUtil.xpIntoLevel(p.xp);
+        int need = LevelUtil.xpForLevel(level + 1) - LevelUtil.xpForLevel(level);
+        String bar = LevelUtil.progressBar(10, into, need);
+        return "`" + into + "/" + need + " XP to L" + (level + 1) + "`\n```\n" + bar + "\n```";
     }
 }

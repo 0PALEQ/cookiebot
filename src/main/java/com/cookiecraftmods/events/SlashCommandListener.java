@@ -4,6 +4,7 @@ import com.cookiecraftmods.database.UserRepository;
 import com.cookiecraftmods.database.UserRepository.UserProfile;
 import com.cookiecraftmods.database.DatabaseManager;
 import com.cookiecraftmods.utils.EmbedUtil;
+import com.cookiecraftmods.utils.LevelUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -41,12 +42,24 @@ public class SlashCommandListener extends ListenerAdapter {
                     event.reply("Profile not found.").setEphemeral(true).queue();
                     return;
                 }
+                int lvl = LevelUtil.levelForXp(p.xp);
+                int into = LevelUtil.xpIntoLevel(p.xp);
+                int need = LevelUtil.xpForLevel(lvl + 1) - LevelUtil.xpForLevel(lvl);
+                String bar = LevelUtil.progressBar(10, into, need);
                 EmbedBuilder eb = EmbedUtil.defaultEmbed()
                         .setTitle(user.getName() + "'s Profile")
                         .addField("XP", String.valueOf(p.xp), true)
                         .addField("Cookies", String.valueOf(p.cookies), true)
-                        .addField("Reputation", String.valueOf(p.reputation), true);
+                        .addField("Reputation", String.valueOf(p.reputation), true)
+                        .addField("Level", String.valueOf(lvl), true)
+                        .addField("Progress", "`" + into + "/" + need + " XP to L" + (lvl + 1) + "`\n```\n" + bar + "\n```", false);
                 event.replyEmbeds(eb.build()).queue();
+                break;
+            case "leaderboard":
+                handleLeaderboard(event);
+                break;
+            case "help":
+                handleHelp(event);
                 break;
             case "rep":
                 var target = event.getOption("user") != null ? event.getOption("user").getAsUser() : null;
@@ -203,4 +216,81 @@ public class SlashCommandListener extends ListenerAdapter {
     }
 
     private record LinkDef(String name, String url) {}
+
+    private void handleLeaderboard(@NotNull SlashCommandInteractionEvent event) {
+        String type = event.getOption("type") != null ? event.getOption("type").getAsString() : "xp";
+        String column;
+        String title;
+        switch (type.toLowerCase()) {
+            case "cookies":
+                column = "cookies"; title = "🍪 Cookies Leaderboard"; break;
+            case "reputation":
+                column = "reputation"; title = "⭐ Reputation Leaderboard"; break;
+            default:
+                column = "xp"; title = "🏆 XP Leaderboard"; break;
+        }
+
+        List<String> lines = new ArrayList<>();
+        long viewerId = event.getUser().getIdLong();
+        int viewerValue = 0;
+        int viewerRank = -1;
+
+        String topSql = "SELECT id, username, " + column + " AS val FROM users ORDER BY " + column + " DESC, id ASC LIMIT 10";
+        String selfSql = "SELECT " + column + " FROM users WHERE id = ?";
+        String rankSql = "SELECT 1 + COUNT(*) FROM users WHERE " + column + " > ?";
+        try (Connection c = db.getConnection()) {
+            // Top list
+            try (PreparedStatement ps = c.prepareStatement(topSql); ResultSet rs = ps.executeQuery()) {
+                int pos = 1;
+                while (rs.next()) {
+                    long id = rs.getLong("id");
+                    String name = rs.getString("username");
+                    int val = rs.getInt("val");
+                    String label = switch (column) { case "xp" -> val + " XP"; case "cookies" -> val + " 🍪"; default -> val + " rep"; };
+                    lines.add("**" + pos + ".** " + name + " — " + label + (id == viewerId ? " ← you" : ""));
+                    pos++;
+                }
+            }
+
+            // Self value
+            try (PreparedStatement ps = c.prepareStatement(selfSql)) {
+                ps.setLong(1, viewerId);
+                try (ResultSet rs = ps.executeQuery()) { if (rs.next()) viewerValue = rs.getInt(1); }
+            }
+            // Self rank
+            try (PreparedStatement ps = c.prepareStatement(rankSql)) {
+                ps.setInt(1, viewerValue);
+                try (ResultSet rs = ps.executeQuery()) { if (rs.next()) viewerRank = rs.getInt(1); }
+            }
+        } catch (SQLException e) {
+            event.reply("Database error: " + e.getMessage()).setEphemeral(true).queue();
+            return;
+        }
+
+        if (lines.isEmpty()) lines.add("No users found.");
+        EmbedBuilder eb = EmbedUtil.defaultEmbed()
+                .setTitle(title)
+                .setDescription(String.join("\n", lines))
+                .setFooter("Your rank: " + (viewerRank < 0 ? "N/A" : ("#" + viewerRank)) + " • Your " + column + ": " + viewerValue, null);
+        event.replyEmbeds(eb.build()).queue();
+    }
+
+    private void handleHelp(@NotNull SlashCommandInteractionEvent event) {
+        List<String> lines = new ArrayList<>();
+        try (Connection c = db.getConnection();
+             PreparedStatement ps = c.prepareStatement("SELECT command, description FROM help ORDER BY id ASC");
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                lines.add("**" + rs.getString(1) + "** — " + rs.getString(2));
+            }
+        } catch (SQLException e) {
+            event.reply("Database error: " + e.getMessage()).setEphemeral(true).queue();
+            return;
+        }
+        if (lines.isEmpty()) lines.add("No help entries found in DB.");
+        EmbedBuilder eb = EmbedUtil.defaultEmbed()
+                .setTitle("Help — Commands")
+                .setDescription(String.join("\n", lines));
+        event.replyEmbeds(eb.build()).queue();
+    }
 }
