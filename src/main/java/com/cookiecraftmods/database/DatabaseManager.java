@@ -12,6 +12,14 @@ public class DatabaseManager {
     private final String user;
     private final String pass;
 
+
+    static {
+        try {
+            Class.forName("org.mariadb.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("MariaDB driver not found in classpath", e);
+        }
+    }
     private DatabaseManager() {
         Dotenv dotenv = Dotenv.configure().ignoreIfMissing().ignoreIfMalformed().load();
         this.url = firstNonBlank(System.getenv("DB_URL"), dotenv.get("DB_URL"));
