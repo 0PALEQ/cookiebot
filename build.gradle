@@ -6,6 +6,7 @@ plugins {
 
 shadowJar {
     archiveFileName = 'cookiebot.jar'
+    archiveClassifier.set('all')
 }
 
 tasks.withType(JavaCompile) {
