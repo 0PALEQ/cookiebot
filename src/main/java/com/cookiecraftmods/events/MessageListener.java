@@ -24,10 +24,8 @@ public class MessageListener extends ListenerAdapter {
         if (event.getAuthor().isBot()) return;
         if (event.isFromType(ChannelType.PRIVATE)) return;
 
-        // Ensure user exists in DB
         repo.ensureUser(event.getAuthor().getIdLong(), event.getAuthor().getName());
 
-        // Award XP for messages with simple cooldown to avoid spam
         String content = event.getMessage().getContentRaw();
         if (content != null && content.trim().length() >= 5) {
             long uid = event.getAuthor().getIdLong();

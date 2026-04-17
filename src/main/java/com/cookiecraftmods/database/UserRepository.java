@@ -135,7 +135,7 @@ public class UserRepository {
                     Timestamp ts = rs.getTimestamp(1);
                     if (ts == null) return true;
                     long diffMs = System.currentTimeMillis() - ts.getTime();
-                    return diffMs >= 24L * 60 * 60 * 1000; // 24h
+                    return diffMs >= 24L * 60 * 60 * 1000;
                 }
             }
         } catch (SQLException e) {
