@@ -5,6 +5,7 @@ build/
 !**/src/test/**/build/
 .kotlin
 .env
+cookiebot.sql
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

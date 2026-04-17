@@ -21,6 +21,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'io.github.cdimascio:dotenv-java:3.2.0'
     implementation("net.dv8tion:JDA:6.4.1")
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.4.1'
 }
 
 test {

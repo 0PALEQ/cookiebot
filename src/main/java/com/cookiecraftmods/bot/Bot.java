@@ -4,6 +4,9 @@ import com.cookiecraftmods.commands.CommandManager;
 import com.cookiecraftmods.config.Config;
 import com.cookiecraftmods.events.MessageListener;
 import com.cookiecraftmods.events.ReadyListener;
+import com.cookiecraftmods.events.GuildMemberJoinListener;
+import com.cookiecraftmods.events.SlashCommandListener;
+import com.cookiecraftmods.events.VoiceListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -28,7 +31,8 @@ public class Bot {
             EnumSet<GatewayIntent> intents = EnumSet.of(
                     GatewayIntent.GUILD_MESSAGES,
                     GatewayIntent.GUILD_MEMBERS,
-                    GatewayIntent.MESSAGE_CONTENT
+                    GatewayIntent.MESSAGE_CONTENT,
+                    GatewayIntent.GUILD_VOICE_STATES
             );
 
             this.commandManager = new CommandManager();
@@ -40,7 +44,10 @@ public class Bot {
                     .setMemberCachePolicy(MemberCachePolicy.DEFAULT)
                     .addEventListeners(
                             new ReadyListener(),
-                            new MessageListener(commandManager)
+                            new MessageListener(commandManager),
+                            new SlashCommandListener(),
+                            new GuildMemberJoinListener(),
+                            new VoiceListener()
                     )
                     .build();
 
