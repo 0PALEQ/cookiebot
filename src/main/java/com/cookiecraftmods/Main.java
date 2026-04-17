@@ -1,17 +1,18 @@
 package com.cookiecraftmods;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import com.cookiecraftmods.bot.Bot;
+import io.github.cdimascio.dotenv.Dotenv;
+
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+        Dotenv dotenv = Dotenv.load();
+        String token = dotenv.get("DISCORD_TOKEN");
+        if (token == null || token.isBlank()) {
+            System.err.println("[CookieBot] DISCORD_TOKEN is not set. Create a .env file with DISCORD_TOKEN=your_token or set env var.");
+            return;
         }
+
+        new Bot(token).start();
     }
 }
