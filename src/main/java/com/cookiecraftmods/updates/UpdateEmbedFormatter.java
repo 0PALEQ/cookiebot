@@ -31,11 +31,11 @@ public class UpdateEmbedFormatter {
 
         EmbedBuilder first = new EmbedBuilder()
                 .setColor(BRAND_COLOR)
-                .setTitle(limit("🍪 Fresh from the oven: " + update.title() + " " + update.version(), 256), validUrl(update.websiteUrl()) ? update.websiteUrl() : null)
+                .setTitle(limit("Fresh from the oven: " + update.title() + " " + update.version(), 256), validUrl(update.websiteUrl()) ? update.websiteUrl() : null)
                 .setDescription(firstDescription(update.summary(), changelogParts.get(0)))
-                .addField("🏷️ Version", safeInline(update.version()), true)
-                .addField("📅 Published", formatDate(update.publishedAt()), true)
-                .addField("🚀 Ready to explore?", "Grab the build below, then tell us what you create!", false)
+                .addField("Version", safeInline(update.version()), true)
+                .addField("Published", formatDate(update.publishedAt()), true)
+                .addField("Ready to explore?", "Grab the build below, then tell us what you create!", false)
                 .setFooter("CookieCraftMods • Update #" + update.id() + " • Part 1/" + totalParts);
 
         if (validUrl(update.imageUrl())) first.setImage(update.imageUrl());
@@ -56,7 +56,7 @@ public class UpdateEmbedFormatter {
         for (int i = 1; i < totalParts; i++) {
             EmbedBuilder continuation = new EmbedBuilder()
                     .setColor(BRAND_COLOR)
-                    .setTitle(limit("📜 Changelog continued — " + update.title(), 256))
+                    .setTitle(limit("Changelog continued — " + update.title(), 256))
                     .setDescription(changelogParts.get(i))
                     .setFooter("CookieCraftMods • Update #" + update.id() + " • Part " + (i + 1) + "/" + totalParts);
 
@@ -71,15 +71,15 @@ public class UpdateEmbedFormatter {
 
     private String firstContent(UpdateAnnouncement update) {
         String roleId = Config.getUpdateRoleId(update.slug());
-        String announcement = "**" + update.title() + " " + update.version() + " just landed!** ✨";
-        return roleId == null ? "🍪 " + announcement : "<@&" + roleId + "> " + announcement;
+        String announcement = "**" + update.title() + " " + update.version() + " just landed!**";
+        return roleId == null ? announcement : "<@&" + roleId + "> " + announcement;
     }
 
     private String firstDescription(String summary, String changelog) {
         String intro = summary == null || summary.isBlank()
                 ? "The workshop doors are open and a brand-new build is ready to play with."
                 : summary.trim();
-        return intro + "\n\n## ✨ What changed\n" + changelog;
+        return intro + "\n\n## What changed\n" + changelog;
     }
 
     List<String> splitChangelog(String raw) {
@@ -115,23 +115,23 @@ public class UpdateEmbedFormatter {
     private List<Button> linkButtons(UpdateAnnouncement update) {
         List<Button> buttons = new ArrayList<>();
         Set<String> urls = new HashSet<>();
-        addButton(buttons, urls, "Read changelog", update.websiteUrl(), "📜");
-        addButton(buttons, urls, "Download", update.downloadUrl(), "📦");
-        addButton(buttons, urls, "Support on Ko-fi", update.kofiUrl(), "☕");
+        addButton(buttons, urls, "Read changelog", update.websiteUrl());
+        addButton(buttons, urls, "Download", update.downloadUrl());
+        addButton(buttons, urls, "Support on Ko-fi", update.kofiUrl());
 
         for (UpdateAnnouncement.ExternalLink link : update.externalLinks()) {
             if (buttons.size() >= 5) break;
             String lower = link.label().toLowerCase(Locale.ROOT);
             if (lower.contains("curseforge") || lower.contains("modrinth")) {
-                addButton(buttons, urls, link.label(), link.url(), lower.contains("modrinth") ? "🟢" : "🔥");
+                addButton(buttons, urls, link.label(), link.url());
             }
         }
         return buttons;
     }
 
-    private void addButton(List<Button> buttons, Set<String> urls, String label, String url, String emoji) {
+    private void addButton(List<Button> buttons, Set<String> urls, String label, String url) {
         if (!validUrl(url) || !urls.add(url)) return;
-        buttons.add(Button.link(url, label).withEmoji(net.dv8tion.jda.api.entities.emoji.Emoji.fromUnicode(emoji)));
+        buttons.add(Button.link(url, label));
     }
 
     private boolean validUrl(String value) {

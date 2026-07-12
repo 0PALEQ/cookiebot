@@ -38,7 +38,7 @@ class UpdateEmbedFormatterTest {
     void projectWithoutMappedRoleStillAnnouncesWithoutRoleMention() {
         MessageCreateData message = formatter.format(announcement("dd", "- Fixed sunrise timing")).get(0);
 
-        assertTrue(message.getContent().startsWith("🍪"));
+        assertTrue(message.getContent().startsWith("**Modern Decorations"));
         assertTrue(!message.getContent().contains("<@&"));
     }
 
