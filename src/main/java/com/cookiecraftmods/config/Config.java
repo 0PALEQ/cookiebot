@@ -29,6 +29,10 @@ public final class Config {
         return get("UPDATES_CHANNEL_ID", "1099589405192228926");
     }
 
+    public static String getAllUpdatesRoleId() {
+        return get("ALL_UPDATES_ROLE_ID", "1277223801205297306");
+    }
+
     public static String getUpdateFeedUrl() {
         return get("DISCORD_UPDATE_FEED_URL", "https://cookiecraftmods.com/api/discord/update-announcements");
     }

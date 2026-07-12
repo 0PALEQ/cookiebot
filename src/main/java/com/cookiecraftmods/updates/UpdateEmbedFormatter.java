@@ -35,7 +35,7 @@ public class UpdateEmbedFormatter {
                 .setDescription(firstDescription(update.summary(), changelogParts.get(0)))
                 .addField("Version", safeInline(update.version()), true)
                 .addField("Published", formatDate(update.publishedAt()), true)
-                .addField("Ready to explore?", "Grab the build below, then tell us what you create!", false)
+                .addField("Ready to explore?", "Grab the build below, then tell us what you create", false)
                 .setFooter("CookieCraftMods • Update #" + update.id() + " • Part 1/" + totalParts);
 
         if (validUrl(update.imageUrl())) first.setImage(update.imageUrl());
@@ -47,7 +47,12 @@ public class UpdateEmbedFormatter {
                 .setAllowedMentions(EnumSet.of(Message.MentionType.ROLE));
 
         String roleId = Config.getUpdateRoleId(update.slug());
-        if (roleId != null) firstMessage.mentionRoles(roleId);
+        String allUpdatesRoleId = Config.getAllUpdatesRoleId();
+        if (roleId == null) {
+            firstMessage.mentionRoles(allUpdatesRoleId);
+        } else {
+            firstMessage.mentionRoles(allUpdatesRoleId, roleId);
+        }
 
         List<Button> buttons = linkButtons(update);
         if (!buttons.isEmpty()) firstMessage.setComponents(ActionRow.of(buttons));
@@ -71,8 +76,11 @@ public class UpdateEmbedFormatter {
 
     private String firstContent(UpdateAnnouncement update) {
         String roleId = Config.getUpdateRoleId(update.slug());
+        String allUpdatesMention = "<@&" + Config.getAllUpdatesRoleId() + ">";
         String announcement = "**" + update.title() + " " + update.version() + " just landed!**";
-        return roleId == null ? announcement : "<@&" + roleId + "> " + announcement;
+        return roleId == null
+                ? allUpdatesMention + " " + announcement
+                : allUpdatesMention + " <@&" + roleId + "> " + announcement;
     }
 
     private String firstDescription(String summary, String changelog) {

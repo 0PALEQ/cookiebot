@@ -18,6 +18,7 @@ class UpdateEmbedFormatterTest {
         List<MessageCreateData> messages = formatter.format(update);
 
         assertEquals(1, messages.size());
+        assertTrue(messages.get(0).getContent().contains("<@&1277223801205297306>"));
         assertTrue(messages.get(0).getContent().contains("<@&1277223877151555595>"));
         assertEquals(UpdateEmbedFormatter.BRAND_COLOR, messages.get(0).getEmbeds().get(0).getColorRaw());
         assertEquals(3, messages.get(0).getComponents().get(0).asActionRow().getComponents().size());
@@ -31,15 +32,16 @@ class UpdateEmbedFormatterTest {
 
         assertTrue(messages.size() > 1);
         assertTrue(messages.get(1).getEmbeds().get(0).getTitle().contains("continued"));
+        assertTrue(messages.get(0).getContent().contains("<@&1277223801205297306>"));
         assertTrue(messages.get(0).getContent().contains("<@&1507474083342843945>"));
     }
 
     @Test
-    void projectWithoutMappedRoleStillAnnouncesWithoutRoleMention() {
+    void projectWithoutMappedRoleOnlyMentionsAllUpdatesRole() {
         MessageCreateData message = formatter.format(announcement("dd", "- Fixed sunrise timing")).get(0);
 
-        assertTrue(message.getContent().startsWith("**Modern Decorations"));
-        assertTrue(!message.getContent().contains("<@&"));
+        assertTrue(message.getContent().startsWith("<@&1277223801205297306>"));
+        assertEquals(1, message.getContent().split("<@&", -1).length - 1);
     }
 
     private UpdateAnnouncement announcement(String slug, String content) {
