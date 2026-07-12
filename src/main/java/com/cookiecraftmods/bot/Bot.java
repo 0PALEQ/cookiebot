@@ -7,6 +7,7 @@ import com.cookiecraftmods.events.ReadyListener;
 import com.cookiecraftmods.events.GuildMemberJoinListener;
 import com.cookiecraftmods.events.SlashCommandListener;
 import com.cookiecraftmods.events.VoiceListener;
+import com.cookiecraftmods.updates.UpdateAnnouncementPoller;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -49,7 +50,10 @@ public class Bot {
                             new GuildMemberJoinListener(),
                             new VoiceListener()
                     )
-                    .build();
+                    .build()
+                    .awaitReady();
+
+            new UpdateAnnouncementPoller(this.jda).start();
 
         } catch (Exception e) {
             System.err.println("[CookieBot] Failed to start bot: " + e.getMessage());

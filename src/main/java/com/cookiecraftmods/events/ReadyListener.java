@@ -1,5 +1,6 @@
 package com.cookiecraftmods.events;
 
+import com.cookiecraftmods.config.Config;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -11,7 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 public class ReadyListener extends ListenerAdapter {
     @Override
     public void onReady(ReadyEvent event) {
-        Guild guild = event.getJDA().getGuildById(System.getenv("GUILD_ID"));
+        Guild guild = event.getJDA().getGuildById(Config.getGuildId());
 
         if (guild != null) {
             guild.updateCommands().addCommands(

@@ -58,6 +58,13 @@ public class DatabaseManager {
                 ")";
         try (Connection c = getConnection(); Statement st = c.createStatement()) {
             st.execute(sql);
+            st.execute("CREATE TABLE IF NOT EXISTS update_deliveries (" +
+                    "announcement_id BIGINT PRIMARY KEY," +
+                    "next_part INT NOT NULL DEFAULT 0," +
+                    "message_ids TEXT NULL," +
+                    "completed BOOLEAN NOT NULL DEFAULT FALSE," +
+                    "updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" +
+                    ")");
         } catch (SQLException e) {
             System.err.println("[CookieBot] Failed to initialize database schema: " + e.getMessage());
             e.printStackTrace();
