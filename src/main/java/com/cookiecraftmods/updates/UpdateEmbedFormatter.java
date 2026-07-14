@@ -47,10 +47,8 @@ public class UpdateEmbedFormatter {
                 .setAllowedMentions(EnumSet.of(Message.MentionType.ROLE));
 
         String roleId = Config.getUpdateRoleId(update.slug());
-        String allUpdatesRoleId = Config.getAllUpdatesRoleId();
-        if (roleId == null) {
-            firstMessage.mentionRoles(allUpdatesRoleId);
-        } else {
+        if (roleId != null) {
+            String allUpdatesRoleId = Config.getAllUpdatesRoleId();
             firstMessage.mentionRoles(allUpdatesRoleId, roleId);
         }
 
@@ -76,11 +74,10 @@ public class UpdateEmbedFormatter {
 
     private String firstContent(UpdateAnnouncement update) {
         String roleId = Config.getUpdateRoleId(update.slug());
-        String allUpdatesMention = "<@&" + Config.getAllUpdatesRoleId() + ">";
         String announcement = "**" + update.title() + " " + update.version() + " just landed!**";
         return roleId == null
-                ? allUpdatesMention + " " + announcement
-                : allUpdatesMention + " <@&" + roleId + "> " + announcement;
+                ? announcement
+                : "<@&" + Config.getAllUpdatesRoleId() + "> <@&" + roleId + "> " + announcement;
     }
 
     private String firstDescription(String summary, String changelog) {

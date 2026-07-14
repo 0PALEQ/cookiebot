@@ -37,11 +37,11 @@ class UpdateEmbedFormatterTest {
     }
 
     @Test
-    void projectWithoutMappedRoleOnlyMentionsAllUpdatesRole() {
+    void projectWithoutMappedRoleAnnouncesWithoutAnyRoleMention() {
         MessageCreateData message = formatter.format(announcement("dd", "- Fixed sunrise timing")).get(0);
 
-        assertTrue(message.getContent().startsWith("<@&1277223801205297306>"));
-        assertEquals(1, message.getContent().split("<@&", -1).length - 1);
+        assertTrue(message.getContent().startsWith("**Modern Decorations"));
+        assertTrue(!message.getContent().contains("<@&"));
     }
 
     private UpdateAnnouncement announcement(String slug, String content) {
